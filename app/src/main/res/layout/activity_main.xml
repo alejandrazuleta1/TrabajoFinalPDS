@@ -25,7 +25,7 @@
             tools:ignore="ButtonStyle" />
 
         <Button
-            android:id="@+id/btFinalizar"
+            android:id="@+id/btEnd"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Finalizar"

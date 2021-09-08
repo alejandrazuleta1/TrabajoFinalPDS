@@ -7,6 +7,7 @@ import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.os.Bundle
+import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.components.YAxis
@@ -20,7 +21,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener{
     private lateinit var xChart : LineChart
     private lateinit var yChart : LineChart
     private lateinit var zChart : LineChart
-    private var plotData = true
+    private var plotData = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,6 +33,18 @@ class MainActivity : AppCompatActivity(), SensorEventListener{
         if (sensorAccelerometer != null) {
             sensorManager.registerListener(this, sensorAccelerometer, SensorManager.SENSOR_DELAY_NORMAL)
         }
+
+        val btStart : Button = findViewById(R.id.btStart)
+        val btEnd : Button = findViewById(R.id.btEnd)
+
+        btStart.setOnClickListener {
+            plotData = true
+        }
+
+        btEnd.setOnClickListener {
+            plotData = false
+        }
+
         val datax = LineData()
         datax.setValueTextColor(Color.WHITE)
         val datay = LineData()
