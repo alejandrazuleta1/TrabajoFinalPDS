@@ -21,6 +21,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener{
     private lateinit var xChart : LineChart
     private lateinit var yChart : LineChart
     private lateinit var zChart : LineChart
+    private lateinit var fftChart : LineChart
     private var plotData = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -43,6 +44,28 @@ class MainActivity : AppCompatActivity(), SensorEventListener{
 
         btEnd.setOnClickListener {
             plotData = false
+            val processing = Processing()
+            //val listValues = processing.analyse()
+            val listValues = processing.analyseFFT()
+            val listEntries = ArrayList<Entry>()
+            val datafft = fftChart.data
+
+            /*for (i in listValues.indices){
+                listEntries.add(Entry(i.toFloat(), listValues[i]))
+            }*/
+
+            for (i in listValues.first.indices){
+                listEntries.add(Entry(listValues.first[i].toFloat(), listValues.second[i].toFloat()))
+            }
+
+            val lineDataset = LineDataSet(listEntries, "FFT")
+            if (datafft != null) {
+                lineDataset.setDrawCircles(false)
+                datafft.addDataSet(lineDataset)
+                datafft.notifyDataChanged()
+                fftChart.notifyDataSetChanged()
+                fftChart.moveViewToX(datafft.entryCount.toFloat())
+            }
         }
 
         val datax = LineData()
@@ -51,6 +74,8 @@ class MainActivity : AppCompatActivity(), SensorEventListener{
         datay.setValueTextColor(Color.WHITE)
         val dataz = LineData()
         dataz.setValueTextColor(Color.WHITE)
+        val datafft = LineData()
+        datafft.setValueTextColor(Color.WHITE)
 
         xChart = findViewById(R.id.lineChartX)
         xChart.setDrawGridBackground(false)
@@ -69,6 +94,12 @@ class MainActivity : AppCompatActivity(), SensorEventListener{
         zChart.setTouchEnabled(false)
         zChart.setBackgroundColor(Color.WHITE)
         zChart.data = dataz
+
+        fftChart = findViewById(R.id.lineChartFFT)
+        fftChart.setDrawGridBackground(false)
+        fftChart.setTouchEnabled(false)
+        fftChart.setBackgroundColor(Color.WHITE)
+        fftChart.data = datafft
     }
 
     private fun addEntry(event: SensorEvent?) {
