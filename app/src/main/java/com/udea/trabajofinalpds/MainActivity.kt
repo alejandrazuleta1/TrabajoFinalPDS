@@ -1,14 +1,21 @@
 package com.udea.trabajofinalpds
 
 import android.content.Context
+import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.os.Bundle
+import android.view.inputmethod.InputMethodManager
 import android.widget.Button
+import android.widget.ImageView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.chaquo.python.PyException
+import com.chaquo.python.Python
+import com.chaquo.python.android.AndroidPlatform
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.components.YAxis
 import com.github.mikephil.charting.data.Entry
@@ -24,6 +31,8 @@ class MainActivity : AppCompatActivity(), SensorEventListener{
     private lateinit var fftChart : LineChart
     private var plotData = false
 
+    private lateinit var datax : ArrayList<Float>
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -35,39 +44,43 @@ class MainActivity : AppCompatActivity(), SensorEventListener{
             sensorManager.registerListener(this, sensorAccelerometer, SensorManager.SENSOR_DELAY_NORMAL)
         }
 
+        if (! Python.isStarted()) {
+            Python.start(AndroidPlatform(this))
+        }
+
+        val py = Python.getInstance()
+        val module = py.getModule("plot")
+
         val btStart : Button = findViewById(R.id.btStart)
         val btEnd : Button = findViewById(R.id.btEnd)
 
+        datax = ArrayList()
+
         btStart.setOnClickListener {
             plotData = true
+            datax = ArrayList()
         }
 
         btEnd.setOnClickListener {
-            plotData = false
-            val processing = Processing()
-            //val listValues = processing.analyse()
-            val listValues = processing.analyseFFT()
-            val listEntries = ArrayList<Entry>()
-            val datafft = fftChart.data
+            try {
+                val bytes = module.callAttr("plot", datax.toString())
+                    .toJava(ByteArray::class.java)
+                val bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+                findViewById<ImageView>(R.id.imageView).setImageBitmap(bitmap)
 
-            /*for (i in listValues.indices){
-                listEntries.add(Entry(i.toFloat(), listValues[i]))
-            }*/
-
-            for (i in listValues.first.indices){
-                listEntries.add(Entry(listValues.first[i].toFloat(), listValues.second[i].toFloat()))
-            }
-
-            val lineDataset = LineDataSet(listEntries, "FFT")
-            if (datafft != null) {
-                lineDataset.setDrawCircles(false)
-                datafft.addDataSet(lineDataset)
-                datafft.notifyDataChanged()
-                fftChart.notifyDataSetChanged()
-                fftChart.moveViewToX(datafft.entryCount.toFloat())
+                currentFocus?.let {
+                    (getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager)
+                        .hideSoftInputFromWindow(it.windowToken, 0)
+                }
+            } catch (e: PyException) {
+                Toast.makeText(this, e.message, Toast.LENGTH_LONG).show()
             }
         }
 
+        initializeCharts()
+    }
+
+    private fun initializeCharts() {
         val datax = LineData()
         datax.setValueTextColor(Color.WHITE)
         val datay = LineData()
@@ -95,11 +108,38 @@ class MainActivity : AppCompatActivity(), SensorEventListener{
         zChart.setBackgroundColor(Color.WHITE)
         zChart.data = dataz
 
-        fftChart = findViewById(R.id.lineChartFFT)
+        /*fftChart = findViewById(R.id.lineChartFFT)
         fftChart.setDrawGridBackground(false)
         fftChart.setTouchEnabled(false)
         fftChart.setBackgroundColor(Color.WHITE)
-        fftChart.data = datafft
+        fftChart.data = datafft*/
+    }
+
+    private fun end() {
+        plotData = false
+
+        val processing = Processing()
+        //val listValues = processing.analyse()
+        val listValues = processing.analyseFFT()
+        val listEntries = ArrayList<Entry>()
+        val datafft = fftChart.data
+
+        /*for (i in listValues.indices){
+            listEntries.add(Entry(i.toFloat(), listValues[i]))
+        }*/
+
+        for (i in listValues.first.indices){
+            listEntries.add(Entry(listValues.first[i].toFloat(), listValues.second[i].toFloat()))
+        }
+
+        val lineDataset = LineDataSet(listEntries, "FFT")
+        if (datafft != null) {
+            lineDataset.setDrawCircles(false)
+            datafft.addDataSet(lineDataset)
+            datafft.notifyDataChanged()
+            fftChart.notifyDataSetChanged()
+            fftChart.moveViewToX(datafft.entryCount.toFloat())
+        }
     }
 
     private fun addEntry(event: SensorEvent?) {
@@ -115,6 +155,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener{
             }
             dataX.addEntry(Entry(set.entryCount.toFloat(), event!!.values[0]), 0)
             dataX.notifyDataChanged()
+            datax.add(event.values[0])
             xChart.notifyDataSetChanged()
             xChart.setVisibleXRangeMaximum(150f)
             xChart.moveViewToX(dataX.entryCount.toFloat())

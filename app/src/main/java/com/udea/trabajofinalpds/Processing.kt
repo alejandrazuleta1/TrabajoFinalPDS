@@ -1,7 +1,10 @@
 package com.udea.trabajofinalpds
 
+import io.wavebeans.lib.io.input
 import io.wavebeans.lib.io.sine
 import io.wavebeans.lib.stream.fft.fft
+import io.wavebeans.lib.stream.fft.inverseFft
+import io.wavebeans.lib.stream.flatten
 import io.wavebeans.lib.stream.plus
 import io.wavebeans.lib.stream.trim
 import io.wavebeans.lib.stream.window.hamming
