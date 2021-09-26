@@ -14,14 +14,15 @@ def normalize(data):
 
 def plot_autocorrelation(data):
     data=normalize(data)
-    rxx=np.correlate(data,data,"same")
+    rxx=np.correlate(data,data,"full")
     ls, _ = find_peaks(rxx)
     period = np.mean(np.diff(ls))/fs
 
     fig, ax = plt.subplots()
-    ax.plot(rxx)
-    ax.plot(ls,rxx[ls],"v", label="Periodo: {}s".format(period))
-    ax.plot(np.where(rxx == max(rxx[ls]))[0][0],max(rxx[ls]),"X", label="Energía: {}".format(max(rxx[ls])))
+    tau=np.arange(-len(data)+1,len(data),1)
+    ax.plot(tau,rxx)
+    ax.plot(tau[ls],rxx[ls],"v", label="Periodo: {}s".format(period))
+    ax.plot(0,max(rxx[ls]),"X", label="Energía: {}".format(max(rxx[ls])))
     ax.plot()
 
     ax.legend()
