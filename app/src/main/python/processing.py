@@ -2,6 +2,7 @@ import io
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.signal import find_peaks
+from decimal import Decimal, ROUND_05UP
 
 ts=200000*10**(-6)
 fs=1/ts
@@ -52,11 +53,11 @@ def distance(datax):
     return distance
 
 def getDistance(datax, datay, dataz):
+    #TODO: No pueden ser las tres porque en y y z no sa pasos de longitud estándar encontrar cuales serían las utiles
     dx = distance(normalize(datax))
     dy= distance(normalize(datay))
     dz = distance(normalize(dataz))
-    return np.sqrt(np.power(dx,2)+np.power(dy,2)+np.power(dz,2))
-    #return dx
+    return round(dx,2)
 
 def velocity(data):
     diff_data=np.diff(data)
@@ -69,4 +70,9 @@ def velocity(data):
     t=(t_end-t_start)/fs
     d=distance(data)
     return d/t
+
+def getVelocity(datax,datay,dataz):
+    #TODO: Encontrar cual es el eje en que está dando pasos
+    v = velocity(normalize(datax))
+    return round(v,2)
 
