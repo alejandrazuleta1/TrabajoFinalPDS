@@ -90,10 +90,20 @@ class MainActivity : AppCompatActivity(), SensorEventListener{
 
     private fun autocorrelation(module: PyObject) {
         try {
-            val bytes = module.callAttr("getPeriod", datax.toArray())
+            var bytes = module.callAttr("plot_autocorrelation", datax.toArray())
                 .toJava(ByteArray::class.java)
-            val bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+            var bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
             findViewById<ImageView>(R.id.imageView_X).setImageBitmap(bitmap)
+
+            bytes = module.callAttr("plot_autocorrelation", datay.toArray())
+                    .toJava(ByteArray::class.java)
+            bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+            findViewById<ImageView>(R.id.imageView_Y).setImageBitmap(bitmap)
+
+            bytes = module.callAttr("plot_autocorrelation", dataz.toArray())
+                    .toJava(ByteArray::class.java)
+            bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+            findViewById<ImageView>(R.id.imageView_Z).setImageBitmap(bitmap)
 
             currentFocus?.let {
                 (getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager)
