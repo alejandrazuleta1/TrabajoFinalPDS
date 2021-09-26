@@ -76,3 +76,9 @@ def getVelocity(datax,datay,dataz):
     v = velocity(normalize(datax))
     return round(v,2)
 
+def getJumps(datay):
+    datay = normalize(datay)
+    minimos = find_peaks(datay*(-1))[0]
+    loc_min = datay[minimos]<-0.6
+    return minimos[loc_min].size
+

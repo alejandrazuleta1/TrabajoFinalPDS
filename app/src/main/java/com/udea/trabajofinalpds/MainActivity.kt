@@ -77,7 +77,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener{
             autocorrelation(module)
             tv_distance.text = getDistance(module)
             tv_velocity.text = getVelocity(module)
-            //tv_jumps.text = getJumps(module)
+            tv_jumps.text = getJumps(module)
         }
 
         initializeCharts()
@@ -105,8 +105,8 @@ class MainActivity : AppCompatActivity(), SensorEventListener{
 
     private fun getJumps(module: PyObject) : String {
         try {
-            val distance = module.callAttr("getJumps", datax.toArray(), datay.toArray(), dataz.toArray())
-            return distance.toString()
+            val jumps = module.callAttr("getJumps", datay.toArray())
+            return jumps.toString()
         } catch (e: PyException) {
             Toast.makeText(this, e.message, Toast.LENGTH_LONG).show()
         }
