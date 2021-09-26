@@ -33,16 +33,15 @@ class MainActivity : AppCompatActivity(), SensorEventListener{
     private lateinit var zChart : LineChart
     private lateinit var fftChart : LineChart
     private var plotData = false
-    private lateinit var instantaneousDistance : TextView
     private lateinit var datax : ArrayList<Float>
+    private lateinit var datay : ArrayList<Float>
+    private lateinit var dataz : ArrayList<Float>
     private var ts = 200000F*(10F.pow(-6))
     private var fs = 1/ts
-    private lateinit var x0 : String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
         val sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
         val sensorAccelerometer: Sensor? = sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION)
 
@@ -59,21 +58,21 @@ class MainActivity : AppCompatActivity(), SensorEventListener{
 
         val btStart : Button = findViewById(R.id.btStart)
         val btEnd : Button = findViewById(R.id.btEnd)
-        val distanceTotal : TextView = findViewById(R.id.tv_distance_total)
-        instantaneousDistance = findViewById(R.id.tv_distance_inst)
 
         datax = ArrayList()
+        datay = ArrayList()
+        dataz = ArrayList()
 
         btStart.setOnClickListener {
             plotData = true
             datax = ArrayList()
-            x0 = "0"
+            datay = ArrayList()
+            dataz = ArrayList()
         }
 
         btEnd.setOnClickListener {
             plotData = false
             autocorrelation(module)
-            distanceTotal.text = getDistance(module)
         }
 
         initializeCharts()
@@ -94,7 +93,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener{
             val bytes = module.callAttr("getPeriod", datax.toArray())
                 .toJava(ByteArray::class.java)
             val bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
-            findViewById<ImageView>(R.id.imageView).setImageBitmap(bitmap)
+            findViewById<ImageView>(R.id.imageView_X).setImageBitmap(bitmap)
 
             currentFocus?.let {
                 (getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager)
@@ -184,8 +183,6 @@ class MainActivity : AppCompatActivity(), SensorEventListener{
             xChart.notifyDataSetChanged()
             xChart.setVisibleXRangeMaximum(150f)
             xChart.moveViewToX(dataX.entryCount.toFloat())
-
-            instantaneousDistance.text = getInstantaneousDistance(datax.last(),datax.size)
         }
 
         if (dataY != null) {
@@ -196,6 +193,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener{
             }
             dataY.addEntry(Entry(set.entryCount.toFloat(), event!!.values[1]), 0)
             dataY.notifyDataChanged()
+            datay.add(event.values[1])
             yChart.notifyDataSetChanged()
             yChart.setVisibleXRangeMaximum(150f)
             yChart.moveViewToX(dataY.entryCount.toFloat())
@@ -209,17 +207,11 @@ class MainActivity : AppCompatActivity(), SensorEventListener{
             }
             dataZ.addEntry(Entry(set.entryCount.toFloat(), event!!.values[2]), 0)
             dataZ.notifyDataChanged()
+            dataz.add(event.values[2])
             zChart.notifyDataSetChanged()
             zChart.setVisibleXRangeMaximum(150f)
             zChart.moveViewToX(dataZ.entryCount.toFloat())
         }
-    }
-
-    private fun getInstantaneousDistance(a: Float, size: Int): String {
-        val time = size/fs
-        val x = 0.5*a*(time.pow(2)) + x0.toFloat() //falta un termino
-        x0 = x.toString()
-        return x0
     }
 
     private fun createSet(index : Int): LineDataSet {
