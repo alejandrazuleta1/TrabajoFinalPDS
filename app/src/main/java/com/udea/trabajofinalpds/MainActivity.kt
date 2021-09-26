@@ -70,6 +70,13 @@ class MainActivity : AppCompatActivity(), SensorEventListener{
             datax = ArrayList()
             datay = ArrayList()
             dataz = ArrayList()
+            initializeCharts()
+            tv_distance.text=""
+            tv_velocity.text=""
+            tv_jumps.text=""
+            findViewById<ImageView>(R.id.imageView_X).visibility= ImageView.INVISIBLE
+            findViewById<ImageView>(R.id.imageView_Y).visibility= ImageView.INVISIBLE
+            findViewById<ImageView>(R.id.imageView_Z).visibility= ImageView.INVISIBLE
         }
 
         btEnd.setOnClickListener {
@@ -119,16 +126,19 @@ class MainActivity : AppCompatActivity(), SensorEventListener{
                 .toJava(ByteArray::class.java)
             var bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
             findViewById<ImageView>(R.id.imageView_X).setImageBitmap(bitmap)
+            findViewById<ImageView>(R.id.imageView_X).visibility= ImageView.VISIBLE
 
             bytes = module.callAttr("plot_autocorrelation", datay.toArray())
                     .toJava(ByteArray::class.java)
             bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
             findViewById<ImageView>(R.id.imageView_Y).setImageBitmap(bitmap)
+            findViewById<ImageView>(R.id.imageView_Y).visibility= ImageView.VISIBLE
 
             bytes = module.callAttr("plot_autocorrelation", dataz.toArray())
                     .toJava(ByteArray::class.java)
             bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
             findViewById<ImageView>(R.id.imageView_Z).setImageBitmap(bitmap)
+            findViewById<ImageView>(R.id.imageView_Z).visibility= ImageView.VISIBLE
 
             currentFocus?.let {
                 (getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager)
