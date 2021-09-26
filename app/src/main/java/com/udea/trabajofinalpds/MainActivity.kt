@@ -11,7 +11,6 @@ import android.os.Bundle
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.ImageView
-import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.chaquo.python.PyException
@@ -31,7 +30,6 @@ class MainActivity : AppCompatActivity(), SensorEventListener{
     private lateinit var xChart : LineChart
     private lateinit var yChart : LineChart
     private lateinit var zChart : LineChart
-    private lateinit var fftChart : LineChart
     private var plotData = false
     private lateinit var datax : ArrayList<Float>
     private lateinit var datay : ArrayList<Float>
@@ -141,39 +139,6 @@ class MainActivity : AppCompatActivity(), SensorEventListener{
         zChart.setTouchEnabled(false)
         zChart.setBackgroundColor(Color.WHITE)
         zChart.data = dataz
-
-        /*fftChart = findViewById(R.id.lineChartFFT)
-        fftChart.setDrawGridBackground(false)
-        fftChart.setTouchEnabled(false)
-        fftChart.setBackgroundColor(Color.WHITE)
-        fftChart.data = datafft*/
-    }
-
-    private fun end() {
-        plotData = false
-
-        val processing = Processing()
-        //val listValues = processing.analyse()
-        val listValues = processing.analyseFFT()
-        val listEntries = ArrayList<Entry>()
-        val datafft = fftChart.data
-
-        /*for (i in listValues.indices){
-            listEntries.add(Entry(i.toFloat(), listValues[i]))
-        }*/
-
-        for (i in listValues.first.indices){
-            listEntries.add(Entry(listValues.first[i].toFloat(), listValues.second[i].toFloat()))
-        }
-
-        val lineDataset = LineDataSet(listEntries, "FFT")
-        if (datafft != null) {
-            lineDataset.setDrawCircles(false)
-            datafft.addDataSet(lineDataset)
-            datafft.notifyDataChanged()
-            fftChart.notifyDataSetChanged()
-            fftChart.moveViewToX(datafft.entryCount.toFloat())
-        }
     }
 
     private fun addEntry(event: SensorEvent?) {
