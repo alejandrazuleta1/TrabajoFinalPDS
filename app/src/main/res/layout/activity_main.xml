@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:padding="8dp"
     tools:context=".MainActivity">
 
     <LinearLayout
@@ -14,7 +15,8 @@
         android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_weight="0.1">
 
         <Button
             android:id="@+id/btStart"
@@ -34,90 +36,143 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/linearLayout"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/llbuttons">
 
         <com.github.mikephil.charting.charts.LineChart
             android:id="@+id/lineChartX"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            app:layout_constraintBottom_toTopOf="@+id/lineChartY"
-            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/imageView_X"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/lineChartY"/>
+
+        <ImageView
+            android:id="@+id/imageView_X"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:contentDescription="Autocorrelacion_X"
+            app:layout_constraintBottom_toTopOf="@id/lineChartY"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/lineChartX"
             app:layout_constraintTop_toTopOf="parent" />
 
         <com.github.mikephil.charting.charts.LineChart
             android:id="@+id/lineChartY"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            app:layout_constraintBottom_toTopOf="@+id/lineChartZ"
-            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/lineChartX" />
+            app:layout_constraintEnd_toStartOf="@id/imageView_Y"
+            app:layout_constraintTop_toBottomOf="@id/lineChartX"
+            app:layout_constraintBottom_toTopOf="@id/lineChartZ" />
+
+        <ImageView
+            android:id="@+id/imageView_Y"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:contentDescription="Autocorrelacion_Y"
+            app:layout_constraintStart_toEndOf="@id/lineChartY"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/lineChartX"
+            app:layout_constraintBottom_toTopOf="@id/lineChartZ" />
 
         <com.github.mikephil.charting.charts.LineChart
             android:id="@+id/lineChartZ"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            app:layout_constraintBottom_toTopOf="@+id/results"
-            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/lineChartY" />
+            app:layout_constraintEnd_toStartOf="@id/imageView_Z"
+            app:layout_constraintTop_toBottomOf="@id/lineChartY"
+            app:layout_constraintBottom_toTopOf="@id/ll_results" />
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/results"
+        <ImageView
+            android:id="@+id/imageView_Z"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:contentDescription="Autocorrelacion_Y"
+            app:layout_constraintStart_toEndOf="@id/lineChartZ"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/lineChartY"
+            app:layout_constraintBottom_toTopOf="@id/ll_results" />
+
+        <LinearLayout
+            android:id="@+id/ll_results"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:weightSum="0.195"
+            android:paddingTop="8dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/lineChartZ"
-            android:layout_height="0dp"
-            android:layout_width="0dp">
+            app:layout_constraintVertical_bias="0.0">
 
-            <ImageView
-                android:id="@+id/imageView"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:contentDescription="Autocorrelacion"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/ll_results"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+            <TextView
+                android:id="@+id/textView1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="Resultados"
+                android:textStyle="bold" />
 
             <LinearLayout
-                android:id="@+id/ll_results"
-                android:layout_width="wrap_content"
-                android:layout_height="0dp"
-                android:orientation="vertical"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/imageView"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.0">
-
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
                 <TextView
-                    android:id="@+id/textView"
+                    android:id="@+id/textview2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Resultados" />
+                    android:text="Distancia: " />
 
                 <TextView
-                    android:id="@+id/tv_distance_inst"
+                    android:id="@+id/tv_distance"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:hint="Distancia instantánea"/>
-
-                <TextView
-                    android:id="@+id/tv_distance_total"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:hint="Distancia total"/>
-
+                    android:hint="Distancia" />
             </LinearLayout>
-        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/textview3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Velocidad: " />
+
+                <TextView
+                    android:id="@+id/tv_velocity"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:hint="Velocidad" />
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/textview4"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Saltos detectados: " />
+
+                <TextView
+                    android:id="@+id/tv_energy"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:hint="Saltos" />
+            </LinearLayout>
+        </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
