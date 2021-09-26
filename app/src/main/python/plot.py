@@ -1,10 +1,10 @@
 import io
 import matplotlib.pyplot as plt
 import numpy as np
+from scipy.signal import find_peaks
 
 def plot(datax):
-    x = [float(data) for data in datax.split()]
-    rxx = np.correlate(x,x,"full")
+    rxx = np.correlate(datax,datax,"same")
     fig, ax = plt.subplots()
     ax.plot(rxx)
 

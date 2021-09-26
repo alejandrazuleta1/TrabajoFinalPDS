@@ -11,9 +11,11 @@ import android.os.Bundle
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.chaquo.python.PyException
+import com.chaquo.python.PyObject
 import com.chaquo.python.Python
 import com.chaquo.python.android.AndroidPlatform
 import com.github.mikephil.charting.charts.LineChart
@@ -21,6 +23,7 @@ import com.github.mikephil.charting.components.YAxis
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
+import kotlin.math.pow
 
 
 class MainActivity : AppCompatActivity(), SensorEventListener{
@@ -30,8 +33,11 @@ class MainActivity : AppCompatActivity(), SensorEventListener{
     private lateinit var zChart : LineChart
     private lateinit var fftChart : LineChart
     private var plotData = false
-
+    private lateinit var instantaneousDistance : TextView
     private lateinit var datax : ArrayList<Float>
+    private var ts = 200000F*(10F.pow(-6))
+    private var fs = 1/ts
+    private lateinit var x0 : String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,35 +55,54 @@ class MainActivity : AppCompatActivity(), SensorEventListener{
         }
 
         val py = Python.getInstance()
-        val module = py.getModule("plot")
+        val module = py.getModule("processing")
 
         val btStart : Button = findViewById(R.id.btStart)
         val btEnd : Button = findViewById(R.id.btEnd)
+        val distanceTotal : TextView = findViewById(R.id.tv_distance_total)
+        instantaneousDistance = findViewById(R.id.tv_distance_inst)
 
         datax = ArrayList()
 
         btStart.setOnClickListener {
             plotData = true
             datax = ArrayList()
+            x0 = "0"
         }
 
         btEnd.setOnClickListener {
-            try {
-                val bytes = module.callAttr("plot", datax.toString())
-                    .toJava(ByteArray::class.java)
-                val bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
-                findViewById<ImageView>(R.id.imageView).setImageBitmap(bitmap)
-
-                currentFocus?.let {
-                    (getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager)
-                        .hideSoftInputFromWindow(it.windowToken, 0)
-                }
-            } catch (e: PyException) {
-                Toast.makeText(this, e.message, Toast.LENGTH_LONG).show()
-            }
+            plotData = false
+            autocorrelation(module)
+            distanceTotal.text = getDistance(module)
         }
 
         initializeCharts()
+    }
+
+    private fun getDistance(module: PyObject) : String {
+        try {
+            val distance = module.callAttr("getDistance", datax.toArray())
+            return distance.toString()
+        } catch (e: PyException) {
+            Toast.makeText(this, e.message, Toast.LENGTH_LONG).show()
+        }
+        return ""
+    }
+
+    private fun autocorrelation(module: PyObject) {
+        try {
+            val bytes = module.callAttr("getPeriod", datax.toArray())
+                .toJava(ByteArray::class.java)
+            val bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+            findViewById<ImageView>(R.id.imageView).setImageBitmap(bitmap)
+
+            currentFocus?.let {
+                (getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager)
+                    .hideSoftInputFromWindow(it.windowToken, 0)
+            }
+        } catch (e: PyException) {
+            Toast.makeText(this, e.message, Toast.LENGTH_LONG).show()
+        }
     }
 
     private fun initializeCharts() {
@@ -159,6 +184,8 @@ class MainActivity : AppCompatActivity(), SensorEventListener{
             xChart.notifyDataSetChanged()
             xChart.setVisibleXRangeMaximum(150f)
             xChart.moveViewToX(dataX.entryCount.toFloat())
+
+            instantaneousDistance.text = getInstantaneousDistance(datax.last(),datax.size)
         }
 
         if (dataY != null) {
@@ -186,6 +213,13 @@ class MainActivity : AppCompatActivity(), SensorEventListener{
             zChart.setVisibleXRangeMaximum(150f)
             zChart.moveViewToX(dataZ.entryCount.toFloat())
         }
+    }
+
+    private fun getInstantaneousDistance(a: Float, size: Int): String {
+        val time = size/fs
+        val x = 0.5*a*(time.pow(2)) + x0.toFloat() //falta un termino
+        x0 = x.toString()
+        return x0
     }
 
     private fun createSet(index : Int): LineDataSet {
