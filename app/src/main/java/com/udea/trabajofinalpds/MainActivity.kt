@@ -11,6 +11,7 @@ import android.os.Bundle
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.chaquo.python.PyException
@@ -56,6 +57,9 @@ class MainActivity : AppCompatActivity(), SensorEventListener{
 
         val btStart : Button = findViewById(R.id.btStart)
         val btEnd : Button = findViewById(R.id.btEnd)
+        val tv_distance : TextView = findViewById(R.id.tv_distance)
+        val tv_velocity : TextView = findViewById(R.id.tv_velocity)
+        val tv_jumps : TextView = findViewById(R.id.tv_jumps)
 
         datax = ArrayList()
         datay = ArrayList()
@@ -71,6 +75,9 @@ class MainActivity : AppCompatActivity(), SensorEventListener{
         btEnd.setOnClickListener {
             plotData = false
             autocorrelation(module)
+            tv_distance.text = getDistance(module)
+            //tv_velocity.text = getVelocity(module)
+            //tv_jumps.text = getJumps(module)
         }
 
         initializeCharts()
@@ -78,7 +85,27 @@ class MainActivity : AppCompatActivity(), SensorEventListener{
 
     private fun getDistance(module: PyObject) : String {
         try {
-            val distance = module.callAttr("getDistance", datax.toArray())
+            val distance = module.callAttr("getDistance", datax.toArray(), datay.toArray(), dataz.toArray())
+            return distance.toString() + "m"
+        } catch (e: PyException) {
+            Toast.makeText(this, e.message, Toast.LENGTH_LONG).show()
+        }
+        return ""
+    }
+
+    private fun getVelocity(module: PyObject) : String {
+        try {
+            val distance = module.callAttr("getVelocity", datax.toArray(), datay.toArray(), dataz.toArray())
+            return distance.toString()
+        } catch (e: PyException) {
+            Toast.makeText(this, e.message, Toast.LENGTH_LONG).show()
+        }
+        return ""
+    }
+
+    private fun getJumps(module: PyObject) : String {
+        try {
+            val distance = module.callAttr("getJumps", datax.toArray(), datay.toArray(), dataz.toArray())
             return distance.toString()
         } catch (e: PyException) {
             Toast.makeText(this, e.message, Toast.LENGTH_LONG).show()
