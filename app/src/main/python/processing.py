@@ -23,6 +23,8 @@ def plot_autocorrelation(data):
     ax.plot(tau,rxx)
     ax.plot(tau[ls],rxx[ls],"v", label="Periodo: {}s".format(period))
     ax.plot(0,max(rxx[ls]),"X", label="Energía: {}".format(max(rxx[ls])))
+    plt.xlabel('Muestras')
+    plt.ylabel('Amplitud')
     ax.plot()
 
     ax.legend()
@@ -53,11 +55,8 @@ def distance(datax):
     distance=len(peaks)*paso
     return distance
 
-def getDistance(datax, datay, dataz):
-    #TODO: No pueden ser las tres porque en y y z no sa pasos de longitud estándar encontrar cuales serían las utiles
+def getDistance(datax):
     dx = distance(normalize(datax))
-    dy= distance(normalize(datay))
-    dz = distance(normalize(dataz))
     return round(dx,2)
 
 def velocity(data):
@@ -72,8 +71,7 @@ def velocity(data):
     d=distance(data)
     return d/t
 
-def getVelocity(datax,datay,dataz):
-    #TODO: Encontrar cual es el eje en que está dando pasos
+def getVelocity(datax):
     v = velocity(normalize(datax))
     return round(v,2)
 
